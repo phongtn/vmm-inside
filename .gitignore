@@ -28,3 +28,5 @@ MANIFEST
 
 .vscode/
 env/
+
+.DS_Store
