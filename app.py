@@ -9,6 +9,8 @@ from component import col_text, col_table, grid_contest
 external_stylesheets = [dmc.theme.DEFAULT_COLORS]
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
+server = app.server
+
 today = datetime.date.today()
 cc = coco.CountryConverter()
 
