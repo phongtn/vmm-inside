@@ -27,15 +27,14 @@ if response.status_code == 200:
     # Get the JSON data from the response
     json_data = response.json()
 
-    # Extract relevant data: #1_10km, #2_21km, #3_42km, #4_Ultra 100km, #5_Ultra 70km
-    participants = json_data['data']['#5_Ultra 70km']
+    participants = json_data['data']['#3_Ultra 100km']
 
     # Print the DataFrame
     contest_options = [["#1_10km", "10K"],
                        ["#2_21km", "21K"],
-                       ["#3_42km", "42K"],
+                       ["#4_Ultra 50km", "50K"],
                        ["#5_Ultra 70km", "70K"],
-                       ["#4_Ultra 100km", "100K"],
+                       ["#3_Ultra 100km", "100K"],
                        ["#all", "All"]]
 
     app.layout = dmc.Container([
@@ -43,7 +42,7 @@ if response.status_code == 200:
 
         dmc.RadioGroup(
             [dmc.Radio(l, value=k) for k, l in contest_options],
-            value='#4_Ultra 100km',
+            value='#3_Ultra 100km',
             size='sm',
             label='Select a contest',
             id='radio-button-contenst'),
