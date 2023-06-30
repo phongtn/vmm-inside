@@ -4,8 +4,8 @@ import dash_mantine_components as dmc
 import country_converter as coco
 from dash import Dash, callback, Output, Input
 from component import grid_contest
-from flask import jsonify
 import pandas as pd
+from flask import request
 
 
 external_stylesheets = [dmc.theme.DEFAULT_COLORS]
@@ -70,12 +70,18 @@ def make_contest_grid(value):
     else:
         return grid_contest(json_data['data'][value])
 
-@server.route('/data')
+@server.route('/data', methods=['GET'])
 def data_contest():
+    args = request.args
+    data_size = args.to_dict().get('size')
     df = pd.DataFrame(participants, columns=[
                       'BIB', 'Distance', 'Name', 'Gender', 'Birth', 'Country', 'Club'])
     df['Age'] = today.year - df['Birth'].astype(int)
-    return df.head(10).to_json()   
+    header_response = {'Content-Type': 'application/json; charset=utf-8'}
+    data_response = df.to_json()
+    if data_size != None:
+        data_response = df.head(int(data_size)).to_json()
+    return data_response, header_response   
 
 if __name__ == '__main__':
     app.run_server(debug=True)
