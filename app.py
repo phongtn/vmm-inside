@@ -3,7 +3,9 @@ import datetime
 import dash_mantine_components as dmc
 import country_converter as coco
 from dash import Dash, callback, Output, Input
-from component import col_text, col_table, grid_contest
+from component import grid_contest
+from flask import jsonify
+import pandas as pd
 
 
 external_stylesheets = [dmc.theme.DEFAULT_COLORS]
@@ -26,15 +28,15 @@ response = requests.get(url_all_contest)
 if response.status_code == 200:
     # Get the JSON data from the response
     json_data = response.json()
+    default_slected = '#4_Ultra 100km'
 
-    participants = json_data['data']['#3_Ultra 100km']
-
+    participants = json_data['data'][default_slected]
     # Print the DataFrame
-    contest_options = [["#1_10km", "10K"],
-                       ["#2_21km", "21K"],
-                       ["#4_Ultra 50km", "50K"],
-                       ["#5_Ultra 70km", "70K"],
-                       ["#3_Ultra 100km", "100K"],
+    contest_options = [["#2_10km", "10K"],
+                       ["#3_21km", "21K"],
+                       ["#5_Ultra 50km", "50K"],
+                       ["#6_Ultra 70km", "70K"],
+                       [default_slected, "100K"],
                        ["#all", "All"]]
 
     app.layout = dmc.Container([
@@ -42,7 +44,7 @@ if response.status_code == 200:
 
         dmc.RadioGroup(
             [dmc.Radio(l, value=k) for k, l in contest_options],
-            value='#3_Ultra 100km',
+            value=default_slected,
             size='sm',
             label='Select a contest',
             id='radio-button-contenst'),
@@ -67,6 +69,13 @@ def make_contest_grid(value):
         return grid_contest(all_contest)    
     else:
         return grid_contest(json_data['data'][value])
+
+@server.route('/data')
+def data_contest():
+    df = pd.DataFrame(participants, columns=[
+                      'BIB', 'Distance', 'Name', 'Gender', 'Birth', 'Country', 'Club'])
+    df['Age'] = today.year - df['Birth'].astype(int)
+    return df.head(10).to_json()   
 
 if __name__ == '__main__':
     app.run_server(debug=True)
