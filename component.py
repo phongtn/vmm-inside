@@ -59,7 +59,7 @@ def grid_contest(participants):
     # age_group = df.iloc[:, 3:8]
     age_ranges = range(10, 100, 5)
     labels = [
-        f"{start}-{start+5}" for start in age_ranges[:len(age_ranges) - 1]]
+        f"{start}-{start+4}" for start in age_ranges[:len(age_ranges) - 1]]
     df['AG'] = pd.cut(df['Age'], bins=age_ranges, labels=labels)
     age_group = df['AG'].value_counts().reset_index()
     age_group.columns = ['Age Group', 'Count']
@@ -82,7 +82,7 @@ def grid_contest(participants):
     fig_gender = px.pie(gender_counts, values="Count", names="Gender", title="Gender",
                         color_discrete_sequence=px.colors.sequential.RdBu)
 
-    fig_age_group = px.bar(age_group_count, x='Count', y='Age Group', color='Count', orientation='h')
+    fig_age_group = px.bar(age_group_count, y='Count', x='Age Group', color='Count', orientation='v')
     
 
     fig_club = px.pie(club_counts.head(5), values="Count",
@@ -109,18 +109,22 @@ def grid_contest(participants):
                 grow=True,
                 children=[
                     dmc.Col([
-                            dmc.Grid(gutter=68, grow=True, children=[
+                            dmc.Grid(gutter='xs', grow=True, children=[
                                 dmc.Col(
-                                    [col_text(f"Total: {total_runner}")], span='auto'),
+                                    [col_text(f"Total: {total_runner}")], span='content'),
                                 dmc.Col(
-                                    [col_text(f"Finish: {total_runner}")], span='auto'),
+                                    [col_text(f"Finish: {total_runner}")], span='content'),
                                 dmc.Col(
-                                    [col_text(f"DNF: {total_runner}")], span='auto'),
+                                    [col_text(f"DNF: {total_runner}")], span='content'),
                             ])], style=col_style, span=12),
                     # Second row                            
                     dmc.Col([
-                        dmc.Grid(gutter=68, grow=True, children=[
-                            dmc.Col([dcc.Graph(figure=fig_age_group)], span=4),
+                        dmc.Grid(gutter='xs', grow=True, children=[
+                            dmc.Col([dcc.Graph(figure=fig_age_group)], span='auto'),
+                        ])
+                    ], style=col_style, span=12),
+                    dmc.Col([
+                        dmc.Grid(gutter='xs', grow=True, children=[
                             dmc.Col([dcc.Graph(figure=fig_gender)], span='auto'),
                             dmc.Col([dcc.Graph(figure=fig_country)], span='auto'),
                         ])
