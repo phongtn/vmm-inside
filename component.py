@@ -9,6 +9,12 @@ import plotly.graph_objects as go
 
 text_gradient = {"from": "red", "to": "yellow", "deg": 45}
 
+# stylesheet for table's column
+col_style = {
+    "border": f"0px solid {dmc.theme.DEFAULT_COLORS['indigo'][4]}",
+    "textAlign": "center",
+}
+
 
 def col_text(txt_value):
     return dmc.Text(txt_value,
@@ -35,13 +41,24 @@ def col_table(data_frame):
                       )
 
 
-def grid_contest(participants):
+def transform_data(participants, year=2023):
+    if year == '2023':
+        print('query this year: %s' %year)
+        return pd.DataFrame(participants, columns=['BIB', 'Distance', 'Name', 'Gender', 'Birth', 'Country', 'Club'])
+    else:
+        print('query old year: %s and type: %s' %( year, type(year)) )
+        return pd.read_csv('history/result2022.csv', index_col=0)
+
+
+def grid_contest(participants, year):
     today = datetime.date.today()
     cc = coco.CountryConverter()
 
     # Create a DataFrame
-    df = pd.DataFrame(participants, columns=[
-                      'BIB', 'Distance', 'Name', 'Gender', 'Birth', 'Country', 'Club'])
+    # df = pd.DataFrame(participants, columns=[
+    #                   'BIB', 'Distance', 'Name', 'Gender', 'Birth', 'Country', 'Club'])
+
+    df = transform_data(participants, year)
 
     # compute average age of participants
     df['Age'] = today.year - df['Birth'].astype(int)
@@ -82,8 +99,8 @@ def grid_contest(participants):
     fig_gender = px.pie(gender_counts, values="Count", names="Gender", title="Gender",
                         color_discrete_sequence=px.colors.sequential.RdBu)
 
-    fig_age_group = px.bar(age_group_count, y='Count', x='Age Group', color='Count', orientation='v')
-    
+    fig_age_group = px.bar(age_group_count, y='Count',
+                           x='Age Group', color='Count', orientation='v')
 
     fig_club = px.pie(club_counts.head(5), values="Count",
                       names="Club", title="Top 5 Club")
@@ -94,12 +111,6 @@ def grid_contest(participants):
     #                  projection="natural earth")
     fig_country = px.pie(country_counts.head(
         5), values="Count", names="Country", title="Top 5 Country")
-
-    # build style sheet
-    col_style = {
-        "border": f"0px solid {dmc.theme.DEFAULT_COLORS['indigo'][4]}",
-        "textAlign": "center",
-    }
 
     return html.Div(
         id="specific_contest",
@@ -117,26 +128,29 @@ def grid_contest(participants):
                                 dmc.Col(
                                     [col_text(f"DNF: {total_runner}")], span='content'),
                             ])], style=col_style, span=12),
-                    # Second row                            
+                    # Second row
                     dmc.Col([
                         dmc.Grid(gutter='xs', grow=True, children=[
-                            dmc.Col([dcc.Graph(figure=fig_age_group)], span='auto'),
+                            dmc.Col([dcc.Graph(figure=fig_age_group)],
+                                    span='auto'),
                         ])
                     ], style=col_style, span=12),
                     dmc.Col([
                         dmc.Grid(gutter='xs', grow=True, children=[
-                            dmc.Col([dcc.Graph(figure=fig_gender)], span='auto'),
-                            dmc.Col([dcc.Graph(figure=fig_country)], span='auto'),
+                            dmc.Col([dcc.Graph(figure=fig_gender)],
+                                    span='auto'),
+                            dmc.Col([dcc.Graph(figure=fig_country)],
+                                    span='auto'),
                         ])
-                    ], style=col_style, span=12),                
+                    ], style=col_style, span=12),
                     # Next Row
-                    dmc.Col([ 
+                    dmc.Col([
                         dmc.Grid(gutter=68, grow=True, children=[
                             dmc.Col([col_table(country_counts)], span=4),
                             dmc.Col([dcc.Graph(figure=fig_club)], span=5),
                             dmc.Col([col_table(club_counts)], span=3),
                         ])
-                    ], style=col_style, span=12),                    
+                    ], style=col_style, span=12),
                     # dmc.Col([col_table(age_group_count)],
                     #         span=4),
                     dmc.Col([col_table(df)],

@@ -63,19 +63,22 @@ def prepare_data():
                  participant.append('0')
                  participant.append('DNF')
                  
-
+             participant.append('N/A')   
              all_participants.append(participant)    
+             
 
     ## prepare finisher data
 
 
-    df = pd.DataFrame(all_participants, columns=['Distance', 'BIB', 'Name', 'Gender', 'Birth', 'AG', 'Club', 'Result', 'Status'])
+    df = pd.DataFrame(all_participants, columns=['Distance', 'BIB', 'Name', 'Gender', 'Birth', 'AG', 'Club', 'Result', 'Status', 'Country'])
     df['Age'] = today.year - df['Birth'].astype(int)        
     return df
 
 # df = prepare_data()
-df = pd.read_csv('history/result2022.csv', index_col=0)
-# df.to_csv('result2022.csv', index=False)
+# df.to_csv('history/result2022.csv', index=False)
+
+df = pd.read_csv('history/result2022.csv')
+# print(df['Result'].value_counts())
 app.layout = dmc.Container([html.Div(col_table(df))], fluid=True)
 
 ## build api for test

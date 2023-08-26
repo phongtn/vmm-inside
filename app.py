@@ -38,19 +38,42 @@ if response.status_code == 200:
                        ["#5_Ultra 70km", "70K"],
                        [default_slected, "100K"],
                        ["#all", "All"]]
+    contest_select = [
+        {"value": "#1_10km", "label": "10k"},
+        {"value": "#2_21km", "label": "21k"},        
+        {"value": "#4_Ultra 50km", "label": "50k"},
+        {"value": default_slected, "label": "100k"},
+        {"value": "#all", "label": "All"}
+    ]
+
+    year_select = [
+        {"value": "2022", "label": "2022"},
+        {"value": "2023", "label": "2023"},                
+        {"value": "#all", "label": "All"}
+    ]
 
     app.layout = dmc.Container([
-        dmc.Title('Inside the VMM Participants', color="blue", size="h4"),
+        dmc.Title('Inside the VMM Participants', color="blue", size="h4", align='center'),
 
-        dmc.RadioGroup(
-            [dmc.Radio(l, value=k) for k, l in contest_options],
+        dmc.Select(
+            label="Select a contest",
+            placeholder="Select one",
+            id="contest-select-box",
             value=default_slected,
-            size='sm',
-            label='Select a contest',
-            id='radio-button-contenst'),
-        dmc.Text(id="radio-output"),
+            data=contest_select,
+            style={"width": 200, "marginBottom": 10},
+        ),
 
-        contest_layout := grid_contest(participants=participants),
+        dmc.Select(
+            label="Select a year",
+            placeholder="Select one",
+            id="year-select-box",
+            value="2023",
+            data=year_select,
+            style={"width": 200, "marginBottom": 10},
+        ),
+
+        contest_layout := grid_contest(participants=participants, year=2023),
     ], fluid=True)
 else:
     print("Error: Failed to retrieve JSON data. Status code:", response.status_code)
@@ -58,17 +81,20 @@ else:
 
 @callback(
     Output(contest_layout, "children"),
-    Input("radio-button-contenst", "value"))
-def make_contest_grid(value):
-    if ('#all' == value):
+    Input("contest-select-box", "value"),
+    Input("year-select-box", "value"))
+def make_contest_grid(contest, year):
+    print('select contest: ' + contest)
+    if ('#all' == contest):
         all_contest = []
         for e in contest_options[:len(contest_options) - 1]:
             data_contest = json_data['data'][e[0]]
             for i in data_contest:
-                all_contest.append(i)                 
-        return grid_contest(all_contest)    
+                all_contest.append(i)
+        return grid_contest(all_contest, year)
     else:
-        return grid_contest(json_data['data'][value])
+        return grid_contest(json_data['data'][contest], year)
+
 
 @server.route('/data', methods=['GET'])
 def data_contest():
@@ -81,7 +107,8 @@ def data_contest():
     data_response = df.to_json()
     if data_size != None:
         data_response = df.head(int(data_size)).to_json()
-    return data_response, header_response   
+    return data_response, header_response
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
