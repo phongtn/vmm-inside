@@ -41,16 +41,20 @@ def col_table(data_frame):
                       )
 
 
-def transform_data(participants, year=2023):
+def transform_data(participants, year=2023, contest='#all'):
     if year == '2023':
-        print('query this year: %s' %year)
+        # print('query this year: %s' %year)
         return pd.DataFrame(participants, columns=['BIB', 'Distance', 'Name', 'Gender', 'Birth', 'Country', 'Club'])
     else:
-        print('query old year: %s and type: %s' %( year, type(year)) )
-        return pd.read_csv('history/result2022.csv', index_col=0)
+        # print('query old year: %s and contest: %s' %( year, contest) )
+        df = pd.read_csv('history/result2022.csv')
+        if ('#all' == contest):             
+            return df
+        else:
+            return df.loc[df['Distance'] == contest]
 
 
-def grid_contest(participants, year):
+def grid_contest(participants, year, contest='#all'):
     today = datetime.date.today()
     cc = coco.CountryConverter()
 
@@ -58,7 +62,7 @@ def grid_contest(participants, year):
     # df = pd.DataFrame(participants, columns=[
     #                   'BIB', 'Distance', 'Name', 'Gender', 'Birth', 'Country', 'Club'])
 
-    df = transform_data(participants, year)
+    df = transform_data(participants, year, contest)
 
     # compute average age of participants
     df['Age'] = today.year - df['Birth'].astype(int)
@@ -70,6 +74,13 @@ def grid_contest(participants, year):
 
     # count the number of participants
     total_runner = df.shape[0]
+    total_finished = 0
+    total_dnf = 0
+    if 'Status' in df:
+        total_finished = df.loc[df['Status'] == 'Finish'].shape[0]
+        total_dnf = df.loc[df['Status'] == 'DNF'].shape[0]
+
+     # check club   
     vmm_club = df[df['Club'] != '']
 
     # Count by age group
@@ -124,9 +135,9 @@ def grid_contest(participants, year):
                                 dmc.Col(
                                     [col_text(f"Total: {total_runner}")], span='content'),
                                 dmc.Col(
-                                    [col_text(f"Finish: {total_runner}")], span='content'),
+                                    [col_text(f"Finish: {total_finished}")], span='content'),
                                 dmc.Col(
-                                    [col_text(f"DNF: {total_runner}")], span='content'),
+                                    [col_text(f"DNF: {total_dnf}")], span='content'),
                             ])], style=col_style, span=12),
                     # Second row
                     dmc.Col([

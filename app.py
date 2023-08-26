@@ -93,7 +93,7 @@ def make_contest_grid(contest, year):
                 all_contest.append(i)
         return grid_contest(all_contest, year)
     else:
-        return grid_contest(json_data['data'][contest], year)
+        return grid_contest(json_data['data'][contest], year, contest)
 
 
 @server.route('/data', methods=['GET'])
