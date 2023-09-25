@@ -28,20 +28,20 @@ response = requests.get(url_all_contest)
 if response.status_code == 200:
     # Get the JSON data from the response
     json_data = response.json()
-    default_slected = '#3_Ultra 100km'
+    default_slected = '#2_Ultra 100km'
 
     participants = json_data['data'][default_slected]
     # Print the DataFrame
-    contest_options = [["#1_10km", "10K"],
-                       ["#2_21km", "21K"],
-                       ["#4_Ultra 50km", "50K"],
-                       ["#5_Ultra 70km", "70K"],
+    contest_options = [["#4_10km", "10K"],
+                       ["#5_21km", "21K"],
+                       ["#8_Ultra 50km", "50K"],
+                       ["#3_Ultra 70km", "70K"],
                        [default_slected, "100K"],
                        ["#all", "All"]]
     contest_select = [
-        {"value": "#1_10km", "label": "10k"},
-        {"value": "#2_21km", "label": "21k"},        
-        {"value": "#4_Ultra 50km", "label": "50k"},
+        {"value": "#4_10km", "label": "10k"},
+        {"value": "#5_21km", "label": "21k"},        
+        {"value": "#8_Ultra 50km", "label": "50k"},
         {"value": default_slected, "label": "100k"},
         {"value": "#all", "label": "All"}
     ]
